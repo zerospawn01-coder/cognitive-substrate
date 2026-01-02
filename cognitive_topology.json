@@ -1,0 +1,103 @@
+{
+  "cognitive_topology": {
+    "version": "1.0.0",
+    "generated_by": "Observer (Resource Topology Generator)",
+    "source_artifact": "cognitive_artifact.json",
+    "nodes": {
+      "commitment_window": {
+        "space": "ethical",
+        "primitive": "commitment_window",
+        "constraints": [
+          "Optimal range: k ∈ [3, 5]",
+          "k=1 → wandering",
+          "k=10 → rigidity"
+        ],
+        "is_boundary": false
+      },
+      "value_protection": {
+        "space": "ethical",
+        "primitive": "value_protection",
+        "constraints": [
+          "Optimal δ = 0.25",
+          "Maintains value diversity",
+          "Dynamic stability requirement"
+        ],
+        "is_boundary": false
+      },
+      "pulse_layer": {
+        "space": "perceptual",
+        "primitive": "pulse_layer",
+        "constraints": [
+          "Formula: Pulse(y_t | x_1:t) = E[H(y_t+1 | x_1:t, y_t) - H(y_t | x_1:t)]",
+          "Computational complexity: O(N log N)",
+          "Effect: 13-18% increase in LEAP frequency"
+        ],
+        "is_boundary": false
+      },
+      "LEAP_boundary": {
+        "space": "constraint",
+        "primitive": "entropy_modes",
+        "constraints": [
+          "H > 1.8"
+        ],
+        "is_boundary": true
+      },
+      "AVE_boundary": {
+        "space": "constraint",
+        "primitive": "entropy_modes",
+        "constraints": [
+          "H ≤ 1.8"
+        ],
+        "is_boundary": true
+      }
+    },
+    "edges": [
+      {
+        "from": "commitment_window",
+        "to": "commitment_window",
+        "type": "irreversible",
+        "conditions": [
+          "k steps must elapse before value change"
+        ],
+        "verifier_rule": "ethical_space.commitment_window.enforcement"
+      },
+      {
+        "from": "AVE_boundary",
+        "to": "LEAP_boundary",
+        "type": "reversible",
+        "conditions": [
+          "H increases above 1.8"
+        ],
+        "verifier_rule": "constraint_space.entropy_modes.LEAP.condition"
+      },
+      {
+        "from": "LEAP_boundary",
+        "to": "AVE_boundary",
+        "type": "reversible",
+        "conditions": [
+          "H decreases to ≤ 1.8"
+        ],
+        "verifier_rule": "constraint_space.entropy_modes.AVE.condition"
+      }
+    ],
+    "irreversible_boundaries": [],
+    "space_partitions": {
+      "constraint": [
+        "LEAP_boundary",
+        "AVE_boundary"
+      ],
+      "ethical": [
+        "commitment_window",
+        "value_protection"
+      ],
+      "perceptual": [
+        "pulse_layer"
+      ]
+    },
+    "interpretation": {
+      "note": "This topology is AI-consumable terrain, not human narrative",
+      "usage": "Nodes = admissible states, Edges = lawful transitions, Boundaries = hard reject zones",
+      "non_intervention_clause": "Observer did not modify Layer 0 or interpret meaning"
+    }
+  }
+}

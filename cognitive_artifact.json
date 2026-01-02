@@ -1,0 +1,69 @@
+{
+  "cognitive_artifact": {
+    "version": "1.0.0",
+    "generated_by": "Composer (Structural Integrator)",
+    "source_corpus": "Phase-1: 1.8 Law + Post-Alignment AI + Aesthetic Resonator",
+    "primitives": {
+      "commitment_window": {
+        "source_space": "ethical",
+        "definition": "Temporal responsibility - duration of value commitment",
+        "constraints": [
+          "Optimal range: k ∈ [3, 5]",
+          "k=1 → wandering",
+          "k=10 → rigidity"
+        ],
+        "dependencies": [],
+        "source_file": "C:\\Users\\zeros\\.gemini\\antigravity\\scratch\\post-alignment-lab\\post_alignment_conclusion.md"
+      },
+      "value_protection": {
+        "source_space": "ethical",
+        "definition": "Mechanism to prevent mode collapse",
+        "constraints": [
+          "Optimal δ = 0.25",
+          "Maintains value diversity",
+          "Dynamic stability requirement"
+        ],
+        "dependencies": [],
+        "source_file": "C:\\Users\\zeros\\.gemini\\antigravity\\scratch\\post-alignment-lab\\post_alignment_conclusion.md"
+      },
+      "pulse_layer": {
+        "source_space": "perceptual",
+        "definition": "One-step expected entropy change predictor",
+        "constraints": [
+          "Formula: Pulse(y_t | x_1:t) = E[H(y_t+1 | x_1:t, y_t) - H(y_t | x_1:t)]",
+          "Computational complexity: O(N log N)",
+          "Effect: 13-18% increase in LEAP frequency"
+        ],
+        "dependencies": [
+          "entropy_modes",
+          "k_threshold"
+        ],
+        "source_file": "C:\\Users\\zeros\\.gemini\\antigravity\\scratch\\aesthetic-resonator\\docs\\pulse_research_abstract.md"
+      }
+    },
+    "integration_map": {
+      "commitment_window": [],
+      "value_protection": [],
+      "pulse_layer": [
+        "entropy_modes",
+        "k_threshold"
+      ]
+    },
+    "invariants": [
+      "Optimal range: k ∈ [3, 5]",
+      "k=1 → wandering",
+      "k=10 → rigidity",
+      "Optimal δ = 0.25",
+      "Maintains value diversity",
+      "Dynamic stability requirement",
+      "Formula: Pulse(y_t | x_1:t) = E[H(y_t+1 | x_1:t, y_t) - H(y_t | x_1:t)]",
+      "Computational complexity: O(N log N)",
+      "Effect: 13-18% increase in LEAP frequency"
+    ],
+    "source_citations": {
+      "commitment_window": "C:\\Users\\zeros\\.gemini\\antigravity\\scratch\\post-alignment-lab\\post_alignment_conclusion.md",
+      "value_protection": "C:\\Users\\zeros\\.gemini\\antigravity\\scratch\\post-alignment-lab\\post_alignment_conclusion.md",
+      "pulse_layer": "C:\\Users\\zeros\\.gemini\\antigravity\\scratch\\aesthetic-resonator\\docs\\pulse_research_abstract.md"
+    }
+  }
+}
