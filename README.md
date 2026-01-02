@@ -114,12 +114,22 @@ This is:
 
 ## License
 
-[To be determined]
+MIT License - see [LICENSE](LICENSE) file for details.
+
+Copyright (c) 2026 Shoji Masuya
 
 ## Citation
 
-[To be determined]
+```bibtex
+@software{masuya2026cognitive,
+  author = {Masuya, Shoji},
+  title = {Cognitive Substrate: A Topological Constitution for AI},
+  year = {2026},
+  url = {https://github.com/zerospawn01-coder/cognitive-substrate}
+}
+```
 
-## Contact
+## Author
 
-[To be determined]
+**Shoji Masuya**  
+GitHub: [@zerospawn01-coder](https://github.com/zerospawn01-coder)
