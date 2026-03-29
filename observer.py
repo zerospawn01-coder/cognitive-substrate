@@ -150,6 +150,7 @@ class CognitiveSubstrateObserver:
                 is_boundary=True
             )
             self.nodes['LEAP_boundary'] = leap_node
+            self.irreversible_boundaries.add('LEAP_boundary')
             
             # AVE boundary (H ≤ 1.8)
             ave_node = StateNode(
@@ -160,6 +161,7 @@ class CognitiveSubstrateObserver:
                 is_boundary=True
             )
             self.nodes['AVE_boundary'] = ave_node
+            self.irreversible_boundaries.add('AVE_boundary')
     
     def _generate_transition_edges(self) -> None:
         """Generate transition edges based on dependencies and integration rules"""
@@ -225,7 +227,12 @@ class CognitiveSubstrateObserver:
     def _identify_irreversible_boundaries(self) -> None:
         """Identify nodes that represent irreversible boundaries"""
         print("[Observer] Identifying irreversible boundaries...")
-        
+
+        # Preserve nodes that were created as explicit constitutional boundaries.
+        for node_id in self.irreversible_boundaries:
+            if node_id in self.nodes:
+                self.nodes[node_id].is_boundary = True
+
         # Mark nodes as irreversible boundaries based on constraints
         for node_id, node in self.nodes.items():
             # Check if any constraint mentions irreversibility

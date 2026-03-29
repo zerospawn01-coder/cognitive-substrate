@@ -8,6 +8,7 @@ import unittest
 from pathlib import Path
 
 from composer import CognitiveSubstrateComposer
+from observer import CognitiveSubstrateObserver
 from verifier import CognitiveSubstrateVerifier, ValidationStatus
 
 
@@ -61,6 +62,40 @@ class IntegrationTests(unittest.TestCase):
                     constitution_path=str(CONSTITUTION_PATH),
                     corpus_root=str(empty_root),
                 )
+
+    def test_observer_generates_consistent_topology(self) -> None:
+        observer = CognitiveSubstrateObserver(
+            str(CONSTITUTION_PATH),
+            str(ARTIFACT_PATH),
+        )
+        topology = observer.generate_topology()
+
+        self.assertIn("LEAP_boundary", topology.nodes)
+        self.assertIn("AVE_boundary", topology.nodes)
+        self.assertIn("LEAP_boundary", topology.irreversible_boundaries)
+        self.assertIn("AVE_boundary", topology.irreversible_boundaries)
+        self.assertGreaterEqual(len(topology.edges), 3)
+
+    def test_observer_exports_json_and_svg(self) -> None:
+        observer = CognitiveSubstrateObserver(
+            str(CONSTITUTION_PATH),
+            str(ARTIFACT_PATH),
+        )
+        topology = observer.generate_topology()
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            output_dir = Path(temp_dir)
+            json_path = output_dir / "topology.json"
+            svg_path = output_dir / "topology.svg"
+            observer.export_topology(topology, str(json_path))
+            observer.generate_svg_visualization(topology, str(svg_path))
+
+            exported = json.loads(json_path.read_text(encoding="utf-8"))["cognitive_topology"]
+            self.assertIn("LEAP_boundary", exported["irreversible_boundaries"])
+            self.assertIn("AVE_boundary", exported["irreversible_boundaries"])
+            svg_content = svg_path.read_text(encoding="utf-8")
+            self.assertIn("<svg", svg_content)
+            self.assertIn("LEAP_boundary", svg_content)
 
 
 if __name__ == "__main__":

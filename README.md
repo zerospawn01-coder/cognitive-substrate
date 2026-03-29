@@ -82,6 +82,14 @@ result = verifier.validate_proposal(proposal)
 # Violation: "entropy=2.10, expected mode=LEAP, got mode=AVE"
 ```
 
+## Validation
+
+```bash
+python -m unittest -v
+python composer.py  # Fails closed unless the required corpus repositories are accessible
+python observer.py
+```
+
 ---
 
 ## Category
