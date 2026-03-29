@@ -88,6 +88,10 @@ result = verifier.validate_proposal(proposal)
 
 **Infrastructure / Platform**, not AI Ethics.
 
+This repository is best treated as a cross-repo substrate artifact. It is not a duplicate
+of `cognitive-lab` or the split theory repositories; it composes theory from them into
+constitutional, verifier-facing assets.
+
 This is not:
 - A training method
 - An alignment technique
