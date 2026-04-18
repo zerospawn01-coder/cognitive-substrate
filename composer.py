@@ -16,12 +16,11 @@ The Composer DOES:
 - Resolve conflicts only by referencing original author intent
 """
 
+import argparse
 import json
-import os
-from typing import Dict, Any, List, Set
+from typing import Dict, Any, List, Optional, Set
 from dataclasses import dataclass, field
 from pathlib import Path
-import re
 
 
 @dataclass
@@ -54,28 +53,78 @@ class CognitiveSubstrateComposer:
     Output: Unified structure respecting all three theoretical spaces
     """
     
-    def __init__(self, constitution_path: str, corpus_root: str):
+    def __init__(
+        self,
+        constitution_path: str,
+        corpus_root: Optional[str] = None,
+        explicit_space_roots: Optional[Dict[str, str]] = None
+    ):
         """
         Initialize Composer with Constitution and corpus location.
         
         Args:
             constitution_path: Path to cognitive_substrate.json
-            corpus_root: Root directory containing Phase-1 corpus
+            corpus_root: Optional root directory containing sibling source repositories
+            explicit_space_roots: Optional explicit per-space source roots
         """
         # Load Constitution
         with open(constitution_path, 'r', encoding='utf-8') as f:
             self.constitution = json.load(f)['cognitive_substrate']
         
-        self.corpus_root = Path(corpus_root)
+        self.repo_root = Path(constitution_path).resolve().parent
+        self.corpus_root = Path(corpus_root).resolve() if corpus_root else None
         self.primitives: Dict[str, TheoreticalPrimitive] = {}
         self.conflicts: List[str] = []
-        
-        # Define corpus structure
-        self.corpus_paths = {
-            'constraint': self.corpus_root / 'nature_1.8_law',
-            'ethical': self.corpus_root / 'post-alignment-lab',
-            'perceptual': self.corpus_root / 'aesthetic-resonator'
+        self.explicit_space_roots = {
+            key: Path(value).resolve()
+            for key, value in (explicit_space_roots or {}).items()
         }
+        self.corpus_paths = self._resolve_corpus_paths()
+
+    def _resolve_corpus_paths(self) -> Dict[str, Path]:
+        """Resolve source directories for each theoretical space."""
+        search_roots = [self.repo_root.parent]
+        if self.corpus_root:
+            search_roots.insert(0, self.corpus_root)
+
+        candidates = {
+            'constraint': ['nature_1.8_law', 'phase14', 'project-manuals'],
+            'ethical': ['cognitive-lab', 'post-alignment-lab'],
+            'perceptual': ['aesthetic-resonator']
+        }
+
+        resolved: Dict[str, Path] = {}
+        missing: List[str] = []
+
+        for space, repo_names in candidates.items():
+            explicit = self.explicit_space_roots.get(space)
+            if explicit:
+                resolved[space] = explicit
+                continue
+
+            match = None
+            for root in search_roots:
+                for repo_name in repo_names:
+                    candidate = root / repo_name
+                    if candidate.exists():
+                        match = candidate
+                        break
+                if match:
+                    break
+
+            if match:
+                resolved[space] = match
+            else:
+                missing.append(space)
+
+        if missing:
+            raise FileNotFoundError(
+                "Composer requires accessible corpus repositories for "
+                f"{', '.join(missing)}. Provide --corpus-root or explicit "
+                "--*-root arguments so composition does not run against an empty corpus."
+            )
+
+        return resolved
     
     def load_corpus(self) -> None:
         """
@@ -102,6 +151,9 @@ class CognitiveSubstrateComposer:
             'docs/K_1.8_THEORETICAL_JUSTIFICATION.md'
         ])
         
+        if not self.primitives:
+            raise RuntimeError("Composer loaded zero theoretical primitives; refusing to emit an empty artifact.")
+
         print(f"[Composer] Loaded {len(self.primitives)} theoretical primitives")
     
     def _load_space(self, space: str, files: List[str]) -> None:
@@ -111,8 +163,9 @@ class CognitiveSubstrateComposer:
         for file_rel in files:
             file_path = base_path / file_rel
             if not file_path.exists():
-                print(f"[Composer] Warning: {file_path} not found, skipping")
-                continue
+                raise FileNotFoundError(
+                    f"Required corpus file is missing for {space}: {file_path}"
+                )
             
             print(f"[Composer] Parsing {space}/{file_rel}...")
             self._extract_primitives(file_path, space)
@@ -267,6 +320,11 @@ class CognitiveSubstrateComposer:
             invariants=invariants,
             source_citations=source_citations
         )
+
+        if not artifact.primitives or not artifact.invariants:
+            raise RuntimeError(
+                "Artifact is incomplete; at least one primitive and invariant are required."
+            )
         
         print(f"[Composer] Artifact composed with {len(artifact.primitives)} primitives")
         print(f"[Composer] Preserving {len(artifact.invariants)} invariants")
@@ -332,24 +390,61 @@ class CognitiveSubstrateComposer:
         print(f"[Composer] Artifact exported to {output_path}")
 
 
-# Example usage
-if __name__ == "__main__":
-    # Initialize Composer
-    composer = CognitiveSubstrateComposer(
-        constitution_path='cognitive_substrate.json',
-        corpus_root='C:/Users/zeros/.gemini/antigravity/scratch'
+def _build_arg_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description="Compose the cognitive substrate artifact.")
+    parser.add_argument(
+        "--constitution",
+        default="cognitive_substrate.json",
+        help="Path to cognitive_substrate.json",
     )
-    
-    # Load Phase-1 corpus
+    parser.add_argument(
+        "--corpus-root",
+        help="Root directory containing sibling theory repositories.",
+    )
+    parser.add_argument(
+        "--constraint-root",
+        help="Explicit root for constraint-space corpus files.",
+    )
+    parser.add_argument(
+        "--ethical-root",
+        help="Explicit root for ethical-space corpus files.",
+    )
+    parser.add_argument(
+        "--perceptual-root",
+        help="Explicit root for perceptual-space corpus files.",
+    )
+    parser.add_argument(
+        "--output",
+        default="cognitive_artifact.json",
+        help="Output path for the composed artifact.",
+    )
+    return parser
+
+
+def main() -> int:
+    args = _build_arg_parser().parse_args()
+    explicit_space_roots = {
+        key: value
+        for key, value in {
+            "constraint": args.constraint_root,
+            "ethical": args.ethical_root,
+            "perceptual": args.perceptual_root,
+        }.items()
+        if value
+    }
+
+    composer = CognitiveSubstrateComposer(
+        constitution_path=args.constitution,
+        corpus_root=args.corpus_root,
+        explicit_space_roots=explicit_space_roots or None,
+    )
     composer.load_corpus()
-    
-    # Resolve any conflicts
     composer.resolve_conflicts()
-    
-    # Compose unified artifact
     artifact = composer.compose_artifact()
-    
-    # Export artifact
-    composer.export_artifact(artifact, 'cognitive_artifact.json')
-    
+    composer.export_artifact(artifact, args.output)
     print("\n[Composer] Composition complete. Ready for Verifier validation.")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

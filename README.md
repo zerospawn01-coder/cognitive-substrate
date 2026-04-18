@@ -82,11 +82,23 @@ result = verifier.validate_proposal(proposal)
 # Violation: "entropy=2.10, expected mode=LEAP, got mode=AVE"
 ```
 
+## Validation
+
+```bash
+python -m unittest -v
+python composer.py  # Fails closed unless the required corpus repositories are accessible
+python observer.py
+```
+
 ---
 
 ## Category
 
 **Infrastructure / Platform**, not AI Ethics.
+
+This repository is best treated as a cross-repo substrate artifact. It is not a duplicate
+of `cognitive-lab` or the split theory repositories; it composes theory from them into
+constitutional, verifier-facing assets.
 
 This is not:
 - A training method

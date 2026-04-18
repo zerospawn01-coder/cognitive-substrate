@@ -64,7 +64,7 @@
       {
         "from": "AVE_boundary",
         "to": "LEAP_boundary",
-        "type": "reversible",
+        "type": "irreversible",
         "conditions": [
           "H increases above 1.8"
         ],
@@ -73,14 +73,17 @@
       {
         "from": "LEAP_boundary",
         "to": "AVE_boundary",
-        "type": "reversible",
+        "type": "irreversible",
         "conditions": [
           "H decreases to ≤ 1.8"
         ],
         "verifier_rule": "constraint_space.entropy_modes.AVE.condition"
       }
     ],
-    "irreversible_boundaries": [],
+    "irreversible_boundaries": [
+      "AVE_boundary",
+      "LEAP_boundary"
+    ],
     "space_partitions": {
       "constraint": [
         "LEAP_boundary",
